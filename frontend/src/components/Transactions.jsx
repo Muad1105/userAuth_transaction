@@ -26,14 +26,20 @@ const Transactions = () => {
     getTransactionsData();
   }, [userId]);
 
-  const userTransactions = useSelector(
+  const userTransactionDone = useSelector(
     (state) => state.transactionsData.transactionDone
   );
-  console.log(userTransactions);
+  console.log(userTransactionDone);
 
   useEffect(() => {
+    setAddTransaction((prev) => ({
+      ...prev,
+      amount: 0,
+      description: "",
+    }));
+
     getTransactionsData();
-  }, [userTransactions]);
+  }, [userTransactionDone]);
 
   const getTransactionsData = async () => {
     try {
@@ -41,13 +47,17 @@ const Transactions = () => {
         `http://localhost:4000/transactions/user/${userId}`
       );
       console.log(res);
+      //current transaction Data
       const presentTransaction =
         res.data.transactions[res.data.transactions.length - 1];
       console.log(presentTransaction);
+
+      //prev transaction data
       const prevTransaction =
         res.data.transactions[res.data.transactions.length - 2];
       console.log(presentTransaction);
       // console.log(prevTransaction);
+
       setUserLastTransaction(presentTransaction);
       setPrevTransactionData(prevTransaction);
       dispatch(setTransationsDone(false));
@@ -57,7 +67,7 @@ const Transactions = () => {
   };
 
   const handleAddAmount = async () => {
-    // console.log(addTransaction.amount);
+    console.log(addTransaction);
     if (!addTransaction.amount) {
       return;
     }
@@ -72,26 +82,27 @@ const Transactions = () => {
         data
       );
       console.log(res);
-      setAddTransaction({
+      setAddTransaction((prev) => ({
+        ...prev,
         amount: 0,
         description: "",
-      });
+      }));
       dispatch(setTransationsDone(true));
     } catch (err) {
       console.log(err.response.status);
     }
   };
+  useEffect(() => {
+    console.log(addTransaction);
+  }, [addTransaction]);
 
   const handleAmountInput = (e) => {
-    setAddTransaction((prev) =>
-      setAddTransaction({ ...prev, amount: e.target.value })
-    );
+    console.log(e.target.value);
+    setAddTransaction((prev) => ({ ...prev, amount: e.target.value }));
   };
 
   const handleDescriptionInput = (e) => {
-    setAddTransaction((prev) =>
-      setAddTransaction({ ...prev, description: e.target.value })
-    );
+    setAddTransaction((prev) => ({ ...prev, description: e.target.value }));
   };
 
   return (
